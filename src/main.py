@@ -2,6 +2,7 @@ import os.path
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+from tornado.web import Application, RequestHandler
 from tornado.options import define, options
 import string, random
 import uuid
@@ -9,8 +10,8 @@ import uuid
 import aiofiles as aiof
 import logging
 
-define("port", default=8888, help="Run on the given port", type=int)
-class Application(tornado.web.Application):
+define("port", default=8080, help="Run on the given port", type=int)
+class Application(Application):
     def __init__(self):
         handlers = [
             (r"/", MainHandler),
@@ -18,14 +19,14 @@ class Application(tornado.web.Application):
         ]
         tornado.web.Application.__init__(self, handlers)
 
-class MainHandler(tornado.web.RequestHandler):
+class MainHandler(RequestHandler):
     def get(self):
         # self.write('server is running....')
         self.render("www/upload_form.html")
     def post(self):
         pass
 
-class UploadHandler(tornado.web.RequestHandler):
+class UploadHandler(RequestHandler):
     # async def write_to_disk(self, fname, content):
     #     with open(fname, 'wb') as f:
     #         await f.write(content)
@@ -46,7 +47,7 @@ class UploadHandler(tornado.web.RequestHandler):
                 extenstion = os.path.splitext(filename)[1]
                 final_filename = fname + extenstion
 
-                async with aiof.open('uploads/%s' % final_filename, 'wb') as f:
+                async with aiof.open('../uploads/%s' % final_filename, 'wb') as f:
                     await f.write(body)
                     await f.flush()
                 self.finish("File %s is uploaded." % final_filename)

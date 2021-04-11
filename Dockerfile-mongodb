@@ -1,0 +1,17 @@
+FROM ubuntu:20.04
+
+RUN apt update && apt install -y wget gnupg2
+
+# Installation:
+# Import MongoDB public GPG key AND create a MongoDB list file
+RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
+# RUN echo "deb http://repo.mongodb.org/apt/ubuntu $(cat /etc/lsb-release | grep DISTRIB_CODENAME | cut -d= -f2)/mongodb-org/4.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+# Update apt-get sources AND install MongoDB
+RUN apt-get update && apt-get install -y mongodb-org
+# Create the MongoDB data directory
+RUN mkdir -p /data/db
+# Expose port #27017 from the container to the host
+EXPOSE 27017
+# Set /usr/bin/mongod as the dockerized entry-point application
+ENTRYPOINT ["/usr/bin/mongod"]

@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+    mongodb:
+        image: innox/mongodb:4.4
+        container_name: mongodb
+        environment:
+            - PUID=1000
+            - PGID=1000
+        volumes:
+            - ./mongodb-data:/data/db:rw
+        ports:
+            - 27017:27017
+        restart: unless-stopped
+    web:
+        image: innox/web:0.1
+        container_name: web
+        volumes:
+            - ./src:/workspace/src:rw
+        ports:
+            - 8080:8080
+        restart: unless-stopped
+
+networks:
+    defaul:
+        driver: innox-driver-1
