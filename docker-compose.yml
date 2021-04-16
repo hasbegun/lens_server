@@ -15,7 +15,8 @@ services:
         image: innox/web:0.1
         container_name: web
         volumes:
-            - ./src:/workspace/src:rw
+            - ./src:/home/developer/workspace/src:rw
+            - ./uploads:/home/developer/workspace/uploads:rw
         ports:
             - 8080:8080
         restart: unless-stopped

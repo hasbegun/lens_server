@@ -8,7 +8,8 @@ RUN apt update --fix-missing && DEBIAN_FRONTEND=noninteractive \
     sudo vim curl cmake git wget
 
 WORKDIR /opt/workspace
-COPY conf/requirements.txt /opt/workspace/requirements.txt
+COPY conf/pip/requirements.txt /opt/workspace/requirements.txt
+# COPY conf/systemd/web.service /etc/systemd/system/web.service
 
 RUN pip3 install -U pip
 RUN pip3 install -r requirements.txt
@@ -37,5 +38,4 @@ ENV PATH /home/developer/.local/bin:$PATH
 # Avoid first use of sudo warning. c.f. https://askubuntu.com/a/22614/781671
 RUN touch $HOME/.sudo_as_admin_successful
 
-
-CMD ["/bin/bash"]
+ENTRYPOINT ["/home/developer/workspace/src/main.py"]

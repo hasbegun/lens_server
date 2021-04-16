@@ -1,0 +1,5 @@
+aiofiles==0.6.0
+bitarray>=0.3.4
+filetype>=1.0.7
+PyYAML==5.4.1
+tornado==6.1
