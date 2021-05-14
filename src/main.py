@@ -28,8 +28,6 @@ class MainHandler(RequestHandler):
     def get(self):
         # self.write('server is running....')
         self.render("www/upload_form.html")
-    def post(self):
-        pass
 
 
 def main():

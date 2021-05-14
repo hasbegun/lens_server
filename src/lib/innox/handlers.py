@@ -6,28 +6,45 @@ from lib.pybloom import BloomFilter
 from lib.innox.std_logger import logger
 
 class UploadRequestHandler(RequestHandler):
+    """
+    bloom filter reference: https://github.com/jaybaird/python-bloomfilter
+    """
     def initialize(self):
         # open the upload deny file ext list and create a bloom filter DENY_LIST.
-        upload_deny_file = 'upload_deny_list.yaml'
-        bf_config_file = 'bf_config.yaml'
-        BF_DEFAULT_CAP = 50
-        BF_DEFAULT_ER = 0.001
+        upload_config_file = os.path.join(os.path.dirname(__file__), 'conf',
+                                          'upload_config.yaml')
+        BLOOMFILTER_DEFAULT_CAP = 50
+        BLOOMFILTER_DEFAULT_ER = 0.001
+
         try:
-            with open(os.path.join(os.path.dirname(__file__), 'config',
-                      upload_deny_file), 'r') as f:
-                deny_list_dict = yaml.full_load(f)
-                logger.debug('Loading upload deny file ext: %s', deny_list_dict)
-
-            with open(os.path.join(os.path.dirname(__file__), 'config',
-                      bf_config_file), 'r' ) as f:
-                bf_config_dict = yaml.full_load(f)
-                logger.debug('Loading bloom filter config : %s', bf_config_dict)
-
-            deny_list_cap = bf_config_dict.get('capacity', BF_DEFAULT_CAP)
-            error_rate = bf_config_dict.get('error_rate', BF_DEFAULT_ER)
-
-            self.DENY_LIST = BloomFilter(capacity=deny_list_cap, error_rate=error_rate)
-            for i in deny_list_dict.get('deny_ext'):
-                self.DENY_LIST.add(i)
+            logger.debug(upload_config_file)
+            with open(upload_config_file, 'r') as f:
+                logger.debug('bbbb')
+                config_dict = yaml.full_load(f)
+                # config_dict = yaml.load(f, Loader=yaml.FullLoader)
+                logger.debug('Loading config file: %s', config_dict)
         except IOError:
-            logger.error('Loading failed: %s', upload_deny_file)
+            logger.error('Failed to load config file: %s', upload_config_file)
+            return
+
+        # Create a bloomfilter for deny exts.
+        bloomfilter_cap = config_dict.get('upload_deny_ext').get('bloomfilter_cap', BLOOMFILTER_DEFAULT_CAP)
+        bloomfilter_er = config_dict.get('upload_deny_ext').get('error_rate', BLOOMFILTER_DEFAULT_ER)
+        self.DENIED_LIST = BloomFilter(capacity=bloomfilter_cap, error_rate=bloomfilter_er)
+        for i in config_dict.get('upload_deny_ext').get('denied_types'):
+            self.DENIED_LIST.add(i)
+        logger.debug('Upload deny loaded.')
+
+        bloomfilter_cap = config_dict.get('image_restriction').get('bloomfilter_cap', BLOOMFILTER_DEFAULT_CAP)
+        bloomfilter_er = config_dict.get('image_restriction').get('error_rate', BLOOMFILTER_DEFAULT_ER)
+        self.IMG_ALLOWED_LIST = BloomFilter(capacity=bloomfilter_cap, error_rate=bloomfilter_er)
+        for i in config_dict.get('image_restriction').get('allowed_types'):
+            self.IMG_ALLOWED_LIST.add(i)
+        logger.debug('Upload allowed loaded.')
+
+        self.MAX_IMG_SIZE = config_dict.get('image_restriction').get('max_size', 4194304)
+        self.MONGODB_SERVER = config_dict.get('mongodb').get('server', 'mongodb')
+        self.MONGODB_PORT = config_dict.get('mongodb').get('port', 27017)
+        self.MONGODB_DBNAME = config_dict.get('mongodb').get('db_name', 'upload')
+        logger.debug('DB setting loaded.')
+

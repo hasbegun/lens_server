@@ -1,0 +1,32 @@
+mongodb:
+  server: mongodb
+  port: 27017
+  db_name: upload
+
+image_restriction:
+  bloomfilter_cap: 10
+  error_rate: 0.001
+  max_size: 4194304 # 8 * 1024 * 1024 = 8M
+  allowed_types:
+    - .jpg
+    - .jpge
+    - .png
+    - .gif
+    - .webp
+    - .mp4
+
+upload_deny_ext:
+  bloomfilter_cap: 20
+  error_rate: 0.001
+  denied_types:
+    - .php
+    - .php5
+    - .pht
+    - .phtml
+    - .shtml
+    - .asa
+    - .cer
+    - .asax
+    - .swf
+    - .xap
+    - .js
