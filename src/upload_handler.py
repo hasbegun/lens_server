@@ -1,7 +1,5 @@
 # import asyncio
 import aiofiles as aiof
-import filetype
-import magic
 import os
 import gridfs
 import uuid
@@ -11,21 +9,6 @@ from lib.innox.handlers import UploadRequestHandler
 from lib.innox.std_logger import logger
 
 class UploadHandler(UploadRequestHandler):
-    def get_mimetype(self, fobject):
-        logger.debug('magic>>>>>>>> %s', fobject[1024])
-        mime = magic.Magic(mime=True)
-        mimetype = mime.from_buffer(fobject[1024])
-        fobject.seek(0)
-        return mimetype
-
-    def valid_image_mimetype(self, fobject):
-        # http://stackoverflow.com/q/20272579/396300
-        mimetype = self.get_mimetype(fobject)
-        if mimetype:
-            return mimetype.startswith('image')
-        else:
-            return False
-
     async def post(self):
         for field_names, files in self.request.files.items():
             logger.info('Field names: %s', field_names)
@@ -80,7 +63,7 @@ class UploadHandler(UploadRequestHandler):
             return False
 
     def upload_mongo(self, file_content, filename):
-        logger.debug('Server: %s, Port: %s, DB Name',
+        logger.debug('Server: %s, Port: %s, DB Name: %s',
             self.MONGODB_SERVER, self.MONGODB_PORT, self.MONGODB_DBNAME)
 
         try:
