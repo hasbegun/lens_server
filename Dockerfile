@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 RUN apt update --fix-missing && DEBIAN_FRONTEND=noninteractive \
     apt install tzdata -qy &&\
 	apt install -qy build-essential \
-    python3-pip python3-setuptools python3-dev \
+    python3-pip python3-setuptools python3-dev python3-numpy \
     pkg-config \
     sudo vim curl cmake git wget
 

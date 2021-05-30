@@ -1,8 +1,3 @@
-mongodb:
-  server: mongodb
-  port: 27017
-  db_name: upload
-
 image_restriction:
   bloomfilter_cap: 10
   error_rate: 0.001
